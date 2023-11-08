@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>camunda-platform-helm | Camunda Platform 8 Self-Managed Helm charts</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="camunda-platform-helm" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Camunda Platform 8 Self-Managed Helm charts" />
+<meta property="og:description" content="Camunda Platform 8 Self-Managed Helm charts" />
+<link rel="canonical" href="https://drodriguez-305.github.io/camunda-platform-helm/" />
+<meta property="og:url" content="https://drodriguez-305.github.io/camunda-platform-helm/" />
+<meta property="og:site_name" content="camunda-platform-helm" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="camunda-platform-helm" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"Camunda Platform 8 Self-Managed Helm charts","headline":"camunda-platform-helm","name":"camunda-platform-helm","url":"https://drodriguez-305.github.io/camunda-platform-helm/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/camunda-platform-helm/assets/css/style.css?v=2cbd1e8a362fa8f248769e4d01918c357066e80f">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/camunda-platform-helm/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://drodriguez-305.github.io/camunda-platform-helm/">camunda-platform-helm</a></h1>
+      
+
+      <p><a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License" /></a>
+<a href="https://artifacthub.io/packages/search?repo=camunda"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/camunda" alt="Artifact Hub" /></a></p>
+
+<!-- omit in toc -->
+<h1 id="camunda-platform-helm">Camunda Platform Helm</h1>
+
+<p>The Camunda Platform Helm repo contains and hosts Camunda Platform Helm charts.</p>
+
+<p>The charts can be accessed by adding the following Helm repo to your Helm setup:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>helm repo add camunda https://helm.camunda.io
+helm repo update
+</code></pre></div></div>
+
+<!-- omit in toc -->
+<h2 id="toc">ToC</h2>
+
+<ul>
+  <li><a href="#architecture">Architecture</a></li>
+  <li><a href="#installing-charts">Installing Charts</a></li>
+  <li><a href="#configure-charts">Configure Charts</a></li>
+  <li><a href="#uninstalling-charts">Uninstalling Charts</a></li>
+  <li><a href="#deprecation-of-zeebe-charts">Deprecation of zeebe charts</a></li>
+  <li><a href="#issues">Issues</a></li>
+  <li><a href="#contributing">Contributing</a></li>
+</ul>
+
+<h2 id="architecture">Architecture</h2>
+
+<p align="center">
+  <img alt="Camunda Platform 8 Self-Managed Helm charts architecture diagram" src="imgs/camunda-platform-8-self-managed-architecture-diagram-combined-ingress.png" width="80%" />
+</p>
+
+<h2 id="installing-charts">Installing Charts</h2>
+
+<p>Follow <a href="https://docs.camunda.io/docs/self-managed/zeebe-deployment/kubernetes/index/">the instructions in the Camunda Platform documentation</a> to install the Camunda Platform to a K8s cluster.</p>
+
+<p>Check the repo branch for more technical details:
+<a href="https://github.com/camunda/camunda-platform-helm">camunda/camunda-platform-helm</a></p>
+
+<h2 id="configure-charts">Configure Charts</h2>
+
+<p>Helm charts can be configured by using extra values files or directly via the <code class="language-plaintext highlighter-rouge">--set</code> option.
+Ensure to check out the <a href="https://github.com/camunda/camunda-platform-helm/blob/main/charts/camunda-platform/README.md">Camunda Platform Helm Charts Readme</a> for more information.</p>
+
+<p>Example to enable the Prometheus ServiceMonitor for Zeebe:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>helm <span class="nb">install</span> &lt;RELEASE_NAME&gt; camunda/camunda-platform <span class="nt">--set</span> zeebe.prometheusServiceMonitor.enabled<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<h2 id="uninstalling-charts">Uninstalling Charts</h2>
+
+<p>You can remove these charts by running:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>helm uninstall &lt;RELEASE_NAME&gt;
+</code></pre></div></div>
+
+<blockquote>
+  <p>Notice that all the services and pods will be deleted, but not the Persistence Volume Claims which are used to hold the storage for the data generated by the cluster and Elasticsearch. In order to free up the storage you need to manually delete all the Persistent Volume Claims. You can do this by running:</p>
+</blockquote>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pvc
+</code></pre></div></div>
+
+<p>Then delete the ones that you don’t want to keep:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl delete pvc &lt;PVC ids here&gt;
+</code></pre></div></div>
+
+<p>Or delete the related Kubernetes namespace, which contains the resources.</p>
+
+<h2 id="deprecation-of-zeebe-charts">Deprecation of zeebe charts</h2>
+
+<p>With the creation of the Camunda Platform Helm charts (previously known as <code class="language-plaintext highlighter-rouge">ccsm-helm</code>),
+the old <code class="language-plaintext highlighter-rouge">zeebe-*</code> charts have been deprecated. This means they are no longer part of the repository
+or maintained. The packaged charts are still available for download.</p>
+
+<p>The following charts are deprecated:</p>
+
+<ul>
+  <li>zeebe-full-helm</li>
+  <li>zeebe-cluster-helm</li>
+  <li>zeebe-operate-helm</li>
+  <li>zeebe-tasklist-helm</li>
+</ul>
+
+<p>The new <code class="language-plaintext highlighter-rouge">camunda-platform</code> chart is a full replacement of <code class="language-plaintext highlighter-rouge">zeebe-full-helm</code> and replaces (contains) all other charts as sub-charts.
+All sub-charts in <code class="language-plaintext highlighter-rouge">camunda-platform</code> are by default enabled.</p>
+
+<p>Check the <a href="https://github.com/camunda/camunda-platform-helm/blob/main/MIGRATION.md">migration guide</a> for more details.</p>
+
+<h2 id="issues">Issues</h2>
+
+<p>Please create <a href="https://github.com/camunda/camunda-platform-helm/issues">new issues</a> if you find problems with these charts. This repository is hosted using GitHub Pages, and the source code repository can be found <a href="https://github.com/camunda/camunda-platform-helm">here</a>.</p>
+
+<h2 id="contributing">Contributing</h2>
+
+<p>Please familiarize yourself with the <a href="https://github.com/camunda/camunda-platform-helm/blob/main/CONTRIBUTING.md">contribution guide</a> to find out how to contribute to this project. Please also make sure to check the <a href="https://github.com/camunda/camunda-platform-helm/blob/main/charts/camunda-platform/README.md">Camunda Platform Helm Charts Readme</a> to find more information about configuring and developing the charts.</p>
+
+
+      
+      <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
+        This site is open source. <a href="https://github.com/drodriguez-305/camunda-platform-helm/edit/gh-pages/README.md">Improve this page</a>.
+      </div>
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>
