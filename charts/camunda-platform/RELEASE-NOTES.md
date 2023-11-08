@@ -21,3 +21,4 @@ and it follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.
 * move tasklist to the main chart ([#968](https://github.com/camunda/camunda-platform-helm/issues/968))
 * move operate to the main chart ([#964](https://github.com/camunda/camunda-platform-helm/issues/964))
 
+

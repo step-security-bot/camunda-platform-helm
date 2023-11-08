@@ -33,10 +33,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || inputs.identifier || github.ref }}
   cancel-in-progress: true
 
+env:
+  JESSE_SECRET: ${{ secrets.JESSE_SECRET }}
+
 jobs:
   jessejob:
     runs-on: ubuntu-latest
     steps:
     - name: jesse task
-      run: echo hello
+      run: echo hello jesse. Heres your message: $JESSE_SECRET
 
