@@ -12,6 +12,9 @@ on:
   pull_request:
     types:
       - labeled
+  push:
+    branches:
+      - cosign-github-actions
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,7 +22,7 @@ concurrency:
 
 jobs:
   wait-for-release-conditions:
-    if: ${{ contains(github.event.*.labels.*.name, 'release') || github.event.inputs.trigger }}
+    # if: ${{ contains(github.event.*.labels.*.name, 'release') || github.event.inputs.trigger }}
     runs-on: ubuntu-latest
     steps:
       - name: Wait for all PR checks to succeed
@@ -33,6 +36,8 @@ jobs:
   release:
     needs: wait-for-release-conditions
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
@@ -58,13 +63,38 @@ jobs:
       - name: Update Helm dependency
         run: |
           make helm.dependency-update
+      - name: cosign-installer
+        uses: sigstore/cosign-installer@v3.2.0
       - name: Run Chart Releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
           config: .github/config/chart-releaser.yaml
+          install_only: true
         env:
           CR_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           CR_SKIP_EXISTING: 'true'
+      - name: cmd
+        run: |
+          cd charts/camunda-platform
+          cr package .
+          CHART_VERSION="$(yq ".version" Chart.yaml)"
+          cosign sign-blob -y .cr-release-packages/camunda-platform-${CHART_VERSION}.tgz \
+            --bundle camunda-platform-${CHART_VERSION}-cosign.bundle
+          find . -name "*.bundle" -exec ls -lsa {} \;
+          cosign verify-blob .cr-release-packages/camunda-platform-${CHART_VERSION}.tgz \
+            --bundle ./camunda-platform-${CHART_VERSION}-cosign.bundle \
+            --certificate-identity "https://github.com/camunda/camunda-platform-helm/.github/workflows/chart-release.yaml@refs/heads/cosign-github-actions" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+          mkdir -p docs/bundles
+          cp ./camunda-platform-${CHART_VERSION}-cosign.bundle docs/bundles/camunda-platform-${CHART_VERSION}-cosign.bundle
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add docs/bundles/camunda-platform-${CHART_VERSION}-cosign.bundle
+          git commit -m "Update Cosign bundle"
+          # Push to the same branch; adjust if using a different branch for GitHub Pages
+          git push origin HEAD:${{ github.ref }}
+
+
   verify:
     needs: release
     runs-on: ubuntu-latest
@@ -75,9 +105,11 @@ jobs:
           # The verify step happens in the "release" branch before merging to the "main" branch.
           ref: release
           fetch-depth: 0
+      # NOTE: This simple test is under review. So it could fail (it should be fixed in that case).
       - name: Simple smoke test
-        # NOTE: This simple test is under review. So it could fail (it should be fixed in that case).
-        run: |
-          sleep 30
-          make release.verify-components-version
-
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          timeout_minutes: 5
+          retry_wait_seconds: 10
+          command: make release.verify-components-version
