@@ -14,7 +14,7 @@ on:
       - labeled
   push:
     branches:
-      - cosign-github-actions
+      - release
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -92,7 +92,7 @@ jobs:
           git add docs/bundles/camunda-platform-${CHART_VERSION}-cosign.bundle
           git commit -m "Update Cosign bundle"
           # Push to the same branch; adjust if using a different branch for GitHub Pages
-          git push origin HEAD:${{ github.ref }}
+          git push release HEAD:${{ github.ref }}
 
 
   verify:
