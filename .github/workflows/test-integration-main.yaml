@@ -36,6 +36,9 @@ concurrency:
 env:
   JESSE_SECRET: ${{ secrets.JESSE_SECRET }}
 
+permissions:
+  contents: read
+
 jobs:
   jessejob:
     runs-on: ubuntu-latest
