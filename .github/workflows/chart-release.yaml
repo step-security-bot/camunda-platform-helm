@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       trigger:
-        description: 'Trigger release manually'
+        description: 'Trigger release manually test_test'
         required: false
         default: false
         type: boolean
