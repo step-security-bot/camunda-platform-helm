@@ -20,9 +20,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   wait-for-release-conditions:
     # if: ${{ contains(github.event.*.labels.*.name, 'release') || github.event.inputs.trigger }}
+    permissions:
+      checks: read  # for lewagon/wait-on-check-action to get check runs for specific ref
     runs-on: ubuntu-latest
     steps:
       - name: Wait for all PR checks to succeed
