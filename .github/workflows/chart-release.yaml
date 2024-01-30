@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for all PR checks to succeed
-        uses: lewagon/wait-on-check-action@v1.3.1
+        uses: lewagon/wait-on-check-action@e106e5c43e8ca1edea6383a39a01c5ca495fd812 # v1.3.1
         with:
           ref: ${{ github.ref }}
           running-workflow-name: 'wait-for-release-conditions'
@@ -44,8 +44,8 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install env dependencies
-        uses: asdf-vm/actions/install@v3
-      - uses: actions/cache@v3
+        uses: asdf-vm/actions/install@05e0d2ed97b598bfce82fd30daf324ae0c4570e6 # v3
+      - uses: actions/cache@e12d46a63a90f2fae62d114769bbf2a179198b5c # v3
         with:
           path: |
             ~/.cache/go-build
@@ -64,9 +64,9 @@ jobs:
         run: |
           make helm.dependency-update
       - name: cosign-installer
-        uses: sigstore/cosign-installer@v3.2.0
+        uses: sigstore/cosign-installer@1fc5bd396d372bee37d608f955b336615edf79c8 # v3.2.0
       - name: Run Chart Releaser
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@a917fd15b20e8b64b94d9158ad54cd6345335584 # v1.6.0
         with:
           config: .github/config/chart-releaser.yaml
           install_only: true
@@ -107,7 +107,7 @@ jobs:
           fetch-depth: 0
       # NOTE: This simple test is under review. So it could fail (it should be fixed in that case).
       - name: Simple smoke test
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@14672906e672a08bd6eeb15720e9ed3ce869cdd4 # v2
         with:
           max_attempts: 3
           timeout_minutes: 5
